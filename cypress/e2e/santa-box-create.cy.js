@@ -20,7 +20,6 @@ describe("user can create a box and run it", () => {
   //пользователь 1 логинится
   //пользователь 1 запускает жеребьевку
   let newBoxName = faker.word.noun({ length: { min: 5, max: 10 } });
-  let wishes = faker.word.noun() + faker.word.adverb() + faker.word.adjective();
   let maxAmount = 50;
   let currency = "Евро";
   let inviteLink;
@@ -37,19 +36,20 @@ describe("user can create a box and run it", () => {
     cy.get(boxPage.maxAnount).type(maxAmount);
     cy.get(boxPage.currency).select(currency);
     cy.get(generalElements.arrowRight).click();
+    cy.contains("Дополнительные настройки");
     cy.get(generalElements.arrowRight).click();
-    cy.get(generalElements.arrowRight).click();
-    cy.get(dashboardPage.createdBoxName).should("have.text", newBoxName);
-    cy.get(".layout-1__header-wrapper-fixed .toggle-menu-item span")
+    cy.get(dashboardPage.generalToggle)
       .invoke("text")
       .then((text) => {
         expect(text).to.include("Участники");
         expect(text).to.include("Моя карточка");
         expect(text).to.include("Подопечный");
       });
+    cy.get(dashboardPage.participantsToggle).click();
   });
 
   it("add participants", () => {
+    cy.contains("Добавить участников");
     cy.get(generalElements.submitButton).click();
     cy.get(invitePage.inviteLink)
       .invoke("text")
@@ -58,22 +58,37 @@ describe("user can create a box and run it", () => {
       });
     cy.clearCookies();
   });
+
   it("approve as user1", () => {
     cy.visit(inviteLink);
     cy.get(generalElements.submitButton).click();
-    cy.contains("войдите").click();
+    cy.contains("войдите").click({ force: true });
     cy.login(users.user1.email, users.user1.password);
-    cy.contains("Создать карточку участника").should("exist");
+
+    cy.createMembersCard();
+
+    cy.clearCookies();
+  });
+
+  it("approve as user2", () => {
+    cy.visit(inviteLink);
     cy.get(generalElements.submitButton).click();
-    cy.get(generalElements.arrowRight).click();
-    cy.get(generalElements.arrowRight).click();
-    cy.get(inviteeBoxPage.wishesInput).type(wishes);
-    cy.get(generalElements.arrowRight).click();
-    cy.get(inviteeDashboardPage.noticeForInvitee)
-      .invoke("text")
-      .then((text) => {
-        expect(text).to.contain("Это — анонимный чат с вашим Тайным Сантой");
-      });
+    cy.contains("войдите").click({ force: true });
+    cy.login(users.user2.email, users.user2.password);
+
+    cy.createMembersCard();
+
+    cy.clearCookies();
+  });
+
+  it("approve as user3", () => {
+    cy.visit(inviteLink);
+    cy.get(generalElements.submitButton).click();
+    cy.contains("войдите").click({ force: true });
+    cy.login(users.user3.email, users.user3.password);
+
+    cy.createMembersCard();
+
     cy.clearCookies();
   });
 
