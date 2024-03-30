@@ -3,8 +3,7 @@ const boxPage = require("../fixtures/pages/boxPage.json");
 const generalElements = require("../fixtures/pages/general.json");
 const dashboardPage = require("../fixtures/pages/dashboardPage.json");
 const invitePage = require("../fixtures/pages/invitePage.json");
-const inviteeBoxPage = require("../fixtures/pages/inviteeBoxPage.json");
-const inviteeDashboardPage = require("../fixtures/pages/inviteeDashboardPage.json");
+
 import { faker } from "@faker-js/faker";
 
 describe("user can create a box and run it", () => {
@@ -92,20 +91,50 @@ describe("user can create a box and run it", () => {
     cy.clearCookies();
   });
 
-  after("delete box", () => {
+  it("draw lots", () => {
     cy.visit("/login");
     cy.login(users.userAutor.email, users.userAutor.password);
-    cy.get(
-      '.layout-1__header-wrapper-fixed > .layout-1__header > .header > .header__items > .layout-row-start > [href="/account/boxes"] > .header-item > .header-item__text > .txt--med'
-    ).click();
-    cy.get(":nth-child(1) > a.base--clickable > .user-card").first().click();
-    cy.get(
-      ".layout-1__header-wrapper-fixed > .layout-1__header-secondary > .header-secondary > .header-secondary__right-item > .toggle-menu-wrapper > .toggle-menu-button > .toggle-menu-button--inner"
-    ).click();
+    cy.get(dashboardPage.boxes).click();
+    cy.contains(newBoxName).should("be.visible").click();
+    cy.contains("Участников: 3");
+    cy.contains("Перейти к жеребьевке").click();
+    cy.contains("Провести жеребьевку")
+      .should("be.visible")
+      .click({ force: true });
+    cy.contains("Да, провести жеребьевку").click({ force: true });
+    cy.contains("Жеребьевка проведена");
+  });
+
+  after("remove the box", () => {
+    cy.get(boxPage.boxSettings).click();
+
     cy.contains("Архивация и удаление").click({ force: true });
-    cy.get(":nth-child(2) > .form-page-group__main > .frm-wrapper > .frm").type(
-      "Удалить коробку"
-    );
+    cy.get(boxPage.inputDelete).type("Удалить коробку");
     cy.get(".btn-service").click();
   });
 });
+
+
+// it("remove the box", () => {
+  //   cy.request({
+  //     method: "GET",
+  //     url: "/api/account/boxes",
+  //     headers: {
+  //       Cookie:
+  //         "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjY1NTEyNjEsImlhdCI6MTcxMTgxNjA1NywiZXhwIjoxNzE0NDA4MDU3fQ.ceCMNPIOSQJWvpCE2htYK9RruEiZztjNfmzbzne2wbM; refresh=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjY1NTEyNjEsImlhdCI6MTcxMTgxNjA1NywiZXhwIjoxNzE3MDAwMDU3fQ.KWvALuwXSalJYyR3_ByKjzjDROGW8aO0BgBSfd0ZGiw",
+  //     },
+  //   }).then((response) => {
+  //     expect(response.status).to.eq(200);
+  //     keyBox = response.body.box.newBoxName.key;
+  //   });
+  //   cy.request({
+  //     method: "DELETE",
+  //     url: "/api/box/" + keyBox,
+  //     headers: {
+  //       Cookie:
+  //         "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjY1NTEyNjEsImlhdCI6MTcxMTgxNjA1NywiZXhwIjoxNzE0NDA4MDU3fQ.ceCMNPIOSQJWvpCE2htYK9RruEiZztjNfmzbzne2wbM; refresh=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjY1NTEyNjEsImlhdCI6MTcxMTgxNjA1NywiZXhwIjoxNzE3MDAwMDU3fQ.KWvALuwXSalJYyR3_ByKjzjDROGW8aO0BgBSfd0ZGiw",
+  //     },
+  //   }).then((response) => {
+  //     expect(response.status).to.eq(200);
+  //   });
+  // });
