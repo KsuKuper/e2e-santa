@@ -104,37 +104,51 @@ describe("user can create a box and run it", () => {
     cy.contains("Да, провести жеребьевку").click({ force: true });
     cy.contains("Жеребьевка проведена");
   });
+  it("API", () => {
+    cy.request({
+      method: "POST",
+      url: "/api/login?redirect=%2F",
+      body: {
+        email: "nekrashevich.k@mail.ru",
+        password: "TZ1600",
+      },
+    }).then((response) => {
+      cy.log(JSON.stringify(response));
+      expect(response.status).to.eq(200);
 
-  after("remove the box", () => {
-    cy.get(boxPage.boxSettings).click();
+      cy.request({
+        method: "GET",
+        url: "/api/account/boxes",
+        headers: {
+          Cookie:
+            "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjY1NTEyNjEsImlhdCI6MTcxMTgxNjA1NywiZXhwIjoxNzE0NDA4MDU3fQ.ceCMNPIOSQJWvpCE2htYK9RruEiZztjNfmzbzne2wbM; refresh=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjY1NTEyNjEsImlhdCI6MTcxMTgxNjA1NywiZXhwIjoxNzE3MDAwMDU3fQ.KWvALuwXSalJYyR3_ByKjzjDROGW8aO0BgBSfd0ZGiw",
+        },
+      }).then((response) => {
+        cy.log(JSON.stringify(response));
+        expect(response.status).to.eq(200);
+        const keyBox = response.body[0].box.key;
+        cy.log("box ID is:" + keyBox);
 
-    cy.contains("Архивация и удаление").click({ force: true });
-    cy.get(boxPage.inputDelete).type("Удалить коробку");
-    cy.get(".btn-service").click();
+        cy.request({
+          method: "DELETE",
+          url: "/api/box/" + keyBox,
+          headers: {
+            Cookie:
+              "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjY1NTEyNjEsImlhdCI6MTcxMTgxNjA1NywiZXhwIjoxNzE0NDA4MDU3fQ.ceCMNPIOSQJWvpCE2htYK9RruEiZztjNfmzbzne2wbM; refresh=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjY1NTEyNjEsImlhdCI6MTcxMTgxNjA1NywiZXhwIjoxNzE3MDAwMDU3fQ.KWvALuwXSalJYyR3_ByKjzjDROGW8aO0BgBSfd0ZGiw",
+          },
+        }).then((response) => {
+          expect(response.status).to.eq(200);
+        });
+      });
+    });
   });
 });
 
+//   after("remove the box", () => {
+//     cy.get(boxPage.boxSettings).click();
 
-// it("remove the box", () => {
-  //   cy.request({
-  //     method: "GET",
-  //     url: "/api/account/boxes",
-  //     headers: {
-  //       Cookie:
-  //         "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjY1NTEyNjEsImlhdCI6MTcxMTgxNjA1NywiZXhwIjoxNzE0NDA4MDU3fQ.ceCMNPIOSQJWvpCE2htYK9RruEiZztjNfmzbzne2wbM; refresh=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjY1NTEyNjEsImlhdCI6MTcxMTgxNjA1NywiZXhwIjoxNzE3MDAwMDU3fQ.KWvALuwXSalJYyR3_ByKjzjDROGW8aO0BgBSfd0ZGiw",
-  //     },
-  //   }).then((response) => {
-  //     expect(response.status).to.eq(200);
-  //     keyBox = response.body.box.newBoxName.key;
-  //   });
-  //   cy.request({
-  //     method: "DELETE",
-  //     url: "/api/box/" + keyBox,
-  //     headers: {
-  //       Cookie:
-  //         "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjY1NTEyNjEsImlhdCI6MTcxMTgxNjA1NywiZXhwIjoxNzE0NDA4MDU3fQ.ceCMNPIOSQJWvpCE2htYK9RruEiZztjNfmzbzne2wbM; refresh=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjY1NTEyNjEsImlhdCI6MTcxMTgxNjA1NywiZXhwIjoxNzE3MDAwMDU3fQ.KWvALuwXSalJYyR3_ByKjzjDROGW8aO0BgBSfd0ZGiw",
-  //     },
-  //   }).then((response) => {
-  //     expect(response.status).to.eq(200);
-  //   });
-  // });
+//     cy.contains("Архивация и удаление").click({ force: true });
+//     cy.get(boxPage.inputDelete).type("Удалить коробку");
+//     cy.get(".btn-service").click();
+//   });
+// });
