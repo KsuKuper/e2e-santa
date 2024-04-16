@@ -5,7 +5,16 @@
   "main": "cypress.config.js",
   "scripts": {
     "cy:run": "npx cypress run",
-    "cy:open": "npx cypress open"
+    "cy:open": "npx cypress open",
+    "cy:dashboard": "cypress run --record --key 0c742484-d9ff-4459-934b-df8c8292dae1",
+    "cy:spec1": "cypress run --spec 'cypress/e2e/santa-box-create-copy.cy.js' --record --key 0c742484-d9ff-4459-934b-df8c8292dae1 --env '{\"viewport\":\"monitorConfig\"}'",
+    "cy:spec2": "cypress run --spec 'cypress/e2e/santa-box-create.cy.js' --record --key 0c742484-d9ff-4459-934b-df8c8292dae1 --env '{\"viewport\":\"laptopConfig\"}'",
+
+    "cy:nokey:spec1": "cypress run --spec 'cypress/e2e/santa-box-create-copy.cy.js' --env '{\"viewport\":\"laptopConfig\"}'",
+    "cy:nokey:spec2": "cypress run --spec 'cypress/e2e/santa-box-create.cy.js' --env '{\"viewport\":\"monitorConfig\"}'",
+
+    "cy:parallel": "npm run cy:spec1 -- --browser chrome --group chrome --ci-build-id $BUILD_ID --parallel & npm run cy:spec2 -- --browser electron --group electron --ci-build-id $BUILD_ID --parallel",
+    "cy:nokey:parallel": "npm run cy:nokey:spec1 -- --browser chrome & npm run cy:nokey:spec2 -- --browser electron"
   },
   "author": "",
   "license": "ISC",
